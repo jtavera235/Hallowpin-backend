@@ -11,11 +11,12 @@ async fn home() -> impl Responder {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+    println!("New Server is starting up.");
     HttpServer::new(|| {
         App::new()
             .service(hello)
             .route("/api/v0", web::get().to(home))
-    }).bind("127.0.0.1:8000")?
+    }).bind(("0.0.0.0", 3000))?
         .run()
         .await
 }
