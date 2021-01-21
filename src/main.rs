@@ -1,5 +1,10 @@
-use actix_web::{get, post, web, App, HttpResponse, HttpServer, Responder};
+use actix_web::{get, web, App, HttpResponse, HttpServer, Responder};
 use std::env;
+
+fn set_environment_vars() {
+    let key = "DEFAULT_PORT";
+    env::set_var(key, String::from("3000"));
+}
 
 #[get("/")]
 async fn hello() -> impl Responder {
@@ -12,12 +17,19 @@ async fn home() -> impl Responder {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    println!("New Server is starting up.");
 
+    set_environment_vars();
+
+    let default_port = match env::var("DEFAULT_PORT") {
+        Ok(t) => t,
+        Err(e) => panic!("{:?}", e),
+    };
     let port = env::var("PORT")
-        .unwrap_or_else(|_| "3000".to_string())
+        .unwrap_or_else(|_| default_port)
         .parse()
         .expect("PORT must be a number");
+
+    println!("Server starting in port {:?}", port);
 
     HttpServer::new(|| {
         App::new()
